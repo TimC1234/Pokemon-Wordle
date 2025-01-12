@@ -22,7 +22,7 @@ int check_word(char* guess, int wordsize, int status[], char* choice);
 void print_word(char* guess, int wordsize, int status[]); 
 
 // The number of pokemon names in each file
-int sizes[] = {40, 116, 183, 152, 100};
+int sizes[] = {39, 116, 183, 152, 100};
 int numNames = 0;
 
 int main(int argc, char* argv[]) {
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
 
     numNames = sizes[wordsize - 5];
 
-    // load word file into an array of size LISTSIZE
+    // load word file into an array of size numNames
     char options[numNames][wordsize + 1];
 
     for (int i = 0; i < numNames; i++) {
@@ -65,12 +65,13 @@ int main(int argc, char* argv[]) {
     char *choice = options[rand() % numNames];
 
     // allow one more guess than the length of the word
-    int guesses = wordsize + 1;
+    //int guesses = wordsize + 1;
+    int guesses = 6;
     int won = 0;
 
     // print greeting, using ANSI color codes to demonstrate
     printf(GREEN"This is Pokemon Wordle!"RESET"\n");
-    printf("You have %i tries to guess the %i-letter word I'm thinking of\n", guesses, wordsize);
+    printf("You have %i tries to guess the %i-letter Pokemon name I'm thinking of\n", guesses, wordsize);
 
     // main game loop, one iteration for each guess
     for (int i = 0; i < guesses; i++) {
@@ -117,25 +118,36 @@ int main(int argc, char* argv[]) {
 }
 
 char* get_guess(int wordsize) {
-    char guess[5] = "\n";
-    char *attempt = malloc(sizeof(char) * 6);
-    
-    // ensure users actually provide a guess that is the correct length
-    
-    int len = 0;
-    while (1) {
+    char buffer[256]; // Temporary buffer to store the input, large enough to handle longer inputs
+    char *attempt = malloc(sizeof(char) * (wordsize + 1)); // Allocate space for the guess, including null terminator
 
-        scanf("%5s", guess);
-        for (int i = 0; i < 6; i++) {
-            attempt[i] = guess[i];
+    if (!attempt) {
+        printf("Memory allocation failed.\n");
+        exit(1);
+    }
+
+    while (1) {
+        printf("Enter your %d-letter guess: ", wordsize);
+        // Read the entire line of input
+        if (!fgets(buffer, sizeof(buffer), stdin)) {
+            printf("Error reading input. Try again.\n");
+            continue;
         }
-        len = strlen(attempt);
-        if (len == wordsize) {
+
+        // Remove the newline character from the input, if present
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        // Check the length of the input
+        int len = strlen(buffer);
+        if (len < wordsize) {
+            printf("Guess is too short. Please enter exactly %d characters.\n", wordsize);
+        } else {
+            // Copy only the first 'wordsize' characters into 'attempt'
+            strncpy(attempt, buffer, wordsize);
+            attempt[wordsize] = '\0'; // Null-terminate the string
             return attempt;
         }
     }
-    
-    return attempt;
 }
 
 int check_word(char* guess, int wordsize, int status[], char* choice) {
