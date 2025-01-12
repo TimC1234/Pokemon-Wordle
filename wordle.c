@@ -87,16 +87,21 @@ int main(int argc, char* argv[]) {
         }
 
         // Calculate score for the guess
-        int score = check_word(guess, wordsize, status, choice);
+        //int score = check_word(guess, wordsize, status, choice);
+        won = check_word(guess, wordsize, status, choice);
 
         printf("Guess %i: ", i + 1);
 
         // Print the guess
         print_word(guess, wordsize, status);
 
-        // if they guessed it exactly right, set terminate loop
-        if (score == EXACT * wordsize) {
-            won = 1;
+        //if they guessed it exactly right, set terminate loop
+        // if (score == EXACT * wordsize) {
+        //     won = 1;
+        //     break;
+        // }
+
+        if (won) {
             break;
         }
     }
@@ -109,7 +114,8 @@ int main(int argc, char* argv[]) {
     else {
         printf("The word was ");
         for (int i = 0; i < wordsize; i++) {
-            printf("%c", tolower(choice[i]));
+            printf("%c", toupper(choice[i]));
+            //printf("%c", tolower(choice[i]));
         }
         printf("\n");
     }
@@ -156,20 +162,36 @@ int check_word(char* guess, int wordsize, int status[], char* choice) {
     // compare guess to choice and score points as appropriate, storing points in status
 
     for (int i = 0; i < wordsize; i++) {
+        guess[i] = tolower(guess[i]);
+        choice[i] = tolower(choice[i]);
+    }
+
+    for (int i = 0; i < wordsize; i++) {
+        // if (i > 0) {
+        //     guess[i] = tolower(guess[i]);
+        // }
+        // else {
+        //     guess[i] = toupper(guess[i]);
+        // }
+        
         for (int j = 0; j < wordsize; j++) {
-            if (tolower(guess[i]) == tolower(choice[j]) && i == j) {
+            if (guess[i] == choice[j] && i == j) {
                 score += EXACT;
                 status[i] = EXACT;
                 break;
             }
-            else if (tolower(guess[i]) == tolower(choice[j])) {
+            else if (guess[i] == choice[j]) {
                 score += CLOSE;
                 status[i] = CLOSE;
             }
         }
     }
+    if (strcmp(guess, choice) == 0) {
+        //printf("Equal\n");
+        return 1;
+    }
 
-    return score;
+    return 0;
 }
 
 void print_word(char* guess, int wordsize, int status[]) {
@@ -177,13 +199,16 @@ void print_word(char* guess, int wordsize, int status[]) {
 
     for (int i = 0; i < wordsize; i++) {
         if (status[i] == EXACT) {
-            printf(GREEN"%c", tolower(guess[i]));
+            printf(GREEN"%c", toupper(guess[i]));
+            //printf(GREEN"%c", tolower(guess[i]));
         }
         else if (status[i] == CLOSE) {
-            printf(YELLOW"%c", tolower(guess[i]));
+            printf(YELLOW"%c", toupper(guess[i]));
+            //printf(YELLOW"%c", tolower(guess[i]));
         }
         else {
-            printf(RED"%c", tolower(guess[i]));
+            printf(RED"%c", toupper(guess[i]));
+            //printf(RED"%c", tolower(guess[i]));
         }
     }
     printf(RESET);
