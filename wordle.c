@@ -2,9 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-
-// each of our text files contains 1000 words
-#define LISTSIZE 1000
+#include <ctype.h>
 
 // values for colors and score (EXACT == right letter, right place; CLOSE == right letter, wrong place; WRONG == wrong letter)
 #define EXACT 2
@@ -23,6 +21,10 @@ char *get_guess(int wordsize);
 int check_word(char* guess, int wordsize, int status[], char* choice);
 void print_word(char* guess, int wordsize, int status[]); 
 
+// The number of pokemon names in each file
+int sizes[] = {40, 116, 183, 152, 100};
+int numNames = 0;
+
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         printf("Usage: ./wordle wordsize\n");
@@ -32,40 +34,42 @@ int main(int argc, char* argv[]) {
 
     int wordsize = atoi(argv[1]);
 
-    // ensure argv[1] is either 5, 6, 7, or 8 and store that value in wordsize instead
-    //wordsize = 'argv[1]';
+    // ensure argv[1] is either 5, 6, 7, 8 or 9 and store that value in wordsize instead
 
-    if (wordsize < 5 || wordsize > 8) {
-        printf("Error: wordsize must be either 5, 6, 7, or 8\n");
+    if (wordsize < 5 || wordsize > 9) {
+        printf("Error: wordsize must be either 5, 6, 7, 8 or 9\n");
         return 1;
     }
 
-    // open correct file, each file has exactly LISTSIZE words
-    char wl_filename[6];
-    sprintf(wl_filename, "%i.txt", wordsize);
+    char wl_filename[18];
+    
+    sprintf(wl_filename, "%i_Letter_Poke.txt", wordsize);
+
     FILE *wordlist = fopen(wl_filename, "r");
     if (wordlist == NULL) {
         printf("Error opening file %s.\n", wl_filename);
         return 1;
     }
 
-    // load word file into an array of size LISTSIZE
-    char options[LISTSIZE][wordsize + 1];
+    numNames = sizes[wordsize - 5];
 
-    for (int i = 0; i < LISTSIZE; i++) {
+    // load word file into an array of size LISTSIZE
+    char options[numNames][wordsize + 1];
+
+    for (int i = 0; i < numNames; i++) {
         fscanf(wordlist, "%s", options[i]);
     }
 
     // pseudorandomly select a word for this game
     srand(time(NULL));
-    char *choice = options[rand() % LISTSIZE];
+    char *choice = options[rand() % numNames];
 
     // allow one more guess than the length of the word
     int guesses = wordsize + 1;
     int won = 0;
 
     // print greeting, using ANSI color codes to demonstrate
-    printf(GREEN"This is WORDLE50"RESET"\n");
+    printf(GREEN"This is Pokemon Wordle!"RESET"\n");
     printf("You have %i tries to guess the %i-letter word I'm thinking of\n", guesses, wordsize);
 
     // main game loop, one iteration for each guess
@@ -104,7 +108,7 @@ int main(int argc, char* argv[]) {
     else {
         printf("The word was ");
         for (int i = 0; i < wordsize; i++) {
-            printf("%c", choice[i]);
+            printf("%c", tolower(choice[i]));
         }
         printf("\n");
     }
@@ -141,12 +145,12 @@ int check_word(char* guess, int wordsize, int status[], char* choice) {
 
     for (int i = 0; i < wordsize; i++) {
         for (int j = 0; j < wordsize; j++) {
-            if (guess[i] == choice[j] && i == j) {
+            if (tolower(guess[i]) == tolower(choice[j]) && i == j) {
                 score += EXACT;
                 status[i] = EXACT;
                 break;
             }
-            else if (guess[i] == choice[j]) {
+            else if (tolower(guess[i]) == tolower(choice[j])) {
                 score += CLOSE;
                 status[i] = CLOSE;
             }
@@ -161,13 +165,13 @@ void print_word(char* guess, int wordsize, int status[]) {
 
     for (int i = 0; i < wordsize; i++) {
         if (status[i] == EXACT) {
-            printf(GREEN"%c", guess[i]);
+            printf(GREEN"%c", tolower(guess[i]));
         }
         else if (status[i] == CLOSE) {
-            printf(YELLOW"%c", guess[i]);
+            printf(YELLOW"%c", tolower(guess[i]));
         }
         else {
-            printf(RED"%c", guess[i]);
+            printf(RED"%c", tolower(guess[i]));
         }
     }
     printf(RESET);
