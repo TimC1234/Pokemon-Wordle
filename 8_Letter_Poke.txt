@@ -19,7 +19,6 @@ Slowpoke
 Magneton
 Shellder
 Cloyster
-Mr. Mime
 Magikarp
 Gyarados
 Vaporeon
@@ -48,7 +47,6 @@ Delibird
 Skarmory
 Houndour
 Houndoom
-Porygon2
 Stantler
 Smeargle
 Smoochum
@@ -97,7 +95,6 @@ Drifloon
 Drifblim
 Skuntank
 Bronzong
-Mime Jr.
 Garchomp
 Munchlax
 Croagunk
@@ -151,3 +148,5 @@ Reshiram
 Landorus
 Meloetta
 Genesect
+Cranidos
+Shieldon

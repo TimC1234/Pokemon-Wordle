@@ -15,7 +15,6 @@ Unown
 Magby
 Entei
 Lugia
-Ho-oh
 Lotad
 Ralts
 Minun
