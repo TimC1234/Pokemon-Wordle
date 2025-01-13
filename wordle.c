@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
         printf("You won!\n");
     }
     else {
-        printf("The word was ");
+        printf("The Pokemon's name was ");
         for (int i = 0; i < wordsize; i++) {
             printf("%c", toupper(choice[i]));
         }
@@ -150,24 +150,45 @@ char* get_guess(int wordsize) {
 
 int check_word(char* guess, int wordsize, int status[], char* choice) {
     
-    // Fixed case sensitivity by setting all the letters to be lower case
-    for (int i = 0; i < wordsize; i++) {
-        guess[i] = tolower(guess[i]);
-        choice[i] = tolower(choice[i]);
-    }
+    // set first letter of choice to lower case
+    choice[0] = tolower(choice[0]);
+
+    // copy over choice 
+    char choice_cpy[wordsize + 1];
+    strcpy(choice_cpy, choice);
     
-    // compare guess to choice and store progress in status
-    for (int i = 0; i < wordsize; i++) {      
+    // Mark EXACT matches and store in status
+    for (int i = 0; i < wordsize; i++) {
+        
+        // Fixed case sensitivity by setting all the letters to be lower case
+        guess[i] = tolower(guess[i]);
+
+        if (guess[i] == choice_cpy[i]) {
+            status[i] = EXACT;
+            choice_cpy[i] = '-'; // Denote the letter from the solution has been matched up already
+        }
+    }
+
+    // Mark close matches and store in status
+    for (int i = 0; i < wordsize; i++) {
+        // skip letters that have already been matched up
+        if (status[i] == EXACT) {
+            continue;
+        }
         for (int j = 0; j < wordsize; j++) {
-            if (guess[i] == choice[j] && i == j) {
-                status[i] = EXACT;
-                break;
+            // also skip letters that have been matched up
+            if (status[j] == EXACT) {
+                continue;
             }
-            else if (guess[i] == choice[j]) {
+            // check if a letter belongs in the name but is in the wrong position
+            else if (guess[i] == choice_cpy[j]) {
                 status[i] = CLOSE;
+                choice_cpy[j] = '-'; // mark down location of close match
+                break;
             }
         }
     }
+    // final check to see if the guess was an exact match
     if (strcmp(guess, choice) == 0) {
         return 1;
     }
@@ -192,5 +213,4 @@ void print_word(char* guess, int wordsize, int status[]) {
     printf(RESET);
     //printf(GREEN"This is WORDLE50"RESET"\n");
     printf("\n");
-    return;
 }
